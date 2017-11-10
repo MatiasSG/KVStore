@@ -1,0 +1,17 @@
+{
+  "name": "tp20172c",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Orquestador.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cluster": "^0.7.7",
+    "express": "^4.16.2",
+    "promise": "^8.0.1"
+  }
+}
