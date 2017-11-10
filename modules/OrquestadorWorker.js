@@ -1,6 +1,6 @@
 const cluster = require('cluster');
 
-let OrquestadorMessage = require('./OrquestadorMessage');
+let InterprocessMessage = require('./InterprocessMessage');
 let OrquestadorNodeManager = require('./OrquestadorNodeManager');
 
 let OrquestadorWorker = {
@@ -72,7 +72,7 @@ let OrquestadorWorker = {
 	handleProcessMessage: function(obj) {
 		
 		//Recibir ubicación de nuevas claves del processo maestro
-		if(obj.cmd === OrquestadorMessage.NEW_KEY) {
+		if(obj.cmd === InterprocessMessage.NEW_KEY) {
 			OrquestadorNodeManager.register(obj.key, obj.node);
 		}
 		

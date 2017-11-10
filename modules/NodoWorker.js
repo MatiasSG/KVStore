@@ -1,5 +1,3 @@
-const cluster = require('cluster');
-
 let NodoWorker = {
 	
 	data: {},
@@ -33,7 +31,7 @@ let NodoWorker = {
 	},
 	
 	error: function(response, msg) {
-		response.status(404).send({ success: false, error: msg, worker: cluster.worker.id });
+		response.status(404).send({ success: false, error: msg });
 	},
 	
 	save: function(response, key, value) {
@@ -41,7 +39,7 @@ let NodoWorker = {
 		console.log('save: '+key+': '+value);
 		
 		NodoWorker.data[key] = value;
-		response.send({ success: true, key: key, value: value, worker: cluster.worker.id });
+		response.send({ success: true, key: key, value: value });
 		
 	},
 	
@@ -51,7 +49,7 @@ let NodoWorker = {
 			let value = NodoWorker.data[key];
 			
 			console.log('get: '+key+': '+value);			
-			response.send({ success: true, key: key, value: value, worker: cluster.worker.id });
+			response.send({ success: true, key: key, value: value });
 		} else {
 			NodoWorker.error(response, 'Clave inexistente');
 		}

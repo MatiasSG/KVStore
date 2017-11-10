@@ -1,6 +1,6 @@
 const cluster = require('cluster');
 let KVHTTP = require('./KVHTTP');
-let OrquestadorMessage = require('./OrquestadorMessage');
+let InterprocessMessage = require('./InterprocessMessage');
 
 let OrquestadorNodeManager = {
 	
@@ -59,7 +59,7 @@ let OrquestadorNodeManager = {
 			
 			KVHTTP.post(next, '/', { key: key, value: value }).then(function(data) {
 				//Notificar proceso maestro
-				process.send({ cmd: OrquestadorMessage.BROADCAST, key: key, node: next });
+				process.send({ cmd: InterprocessMessage.BROADCAST, key: key, node: next });
 				
 				resolve(data);
 			}, function(err) {
