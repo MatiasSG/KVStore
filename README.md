@@ -25,3 +25,8 @@ Para leer claves, hacer GET al orquestador con el nombre de la clave en la URL:
 ```
 curl http://localhost:3000/nombre
 ```
+## Debugging
+Setear variable DEBUG para activar log:
+```
+export DEBUG=KVStore*
+```
