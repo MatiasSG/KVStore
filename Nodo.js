@@ -14,4 +14,6 @@ if(process.argv.length !== 3) {
 	process.exit();
 }
 
-NodoWorker.init(app, process.argv[2]);
+let port = process.argv[2];
+NodoWorker.init(app, port);
+console.log('Nodo iniciado en puerto '+port);

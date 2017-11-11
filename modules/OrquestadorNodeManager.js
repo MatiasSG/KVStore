@@ -1,6 +1,7 @@
 const cluster = require('cluster');
 let KVHTTP = require('./KVHTTP');
 let InterprocessMessage = require('./InterprocessMessage');
+let debug = require('debug')('KVStore:OrquestadorNodeManager');
 
 let OrquestadorNodeManager = {
 	
@@ -11,7 +12,9 @@ let OrquestadorNodeManager = {
 	attachNode: function(url) {
 
 		return new Promise(function(resolve, reject) {
-					
+			
+			debug('Consultando el estado del nodo %s', url);
+			
 			KVHTTP.get(url, '/status').then(function(data) {
 				OrquestadorNodeManager.nodes.push(url);
 				resolve(url);
@@ -57,12 +60,18 @@ let OrquestadorNodeManager = {
 
 			}
 			
+			debug('Enviando clave %s al nodo %s', key, next);
+			
 			KVHTTP.post(next, '/', { key: key, value: value }).then(function(data) {
+				
+				debug('Clave %s almacenada en %s', key, next);
+				
 				//Notificar proceso maestro
 				process.send({ cmd: InterprocessMessage.BROADCAST, key: key, node: next });
 				
 				resolve(data);
 			}, function(err) {
+				debug('Error al almacenar clave %s en %s', key, next);
 				reject(err);
 			})			
 			
@@ -73,6 +82,7 @@ let OrquestadorNodeManager = {
 	register: function(key, node) {
 		
 		//Registrar nodo asociado a clave
+		debug('Registrar clave %s en worker %s', key, cluster.worker.id);
 		OrquestadorNodeManager.data[key] = node;
 		
 	},
@@ -82,17 +92,21 @@ let OrquestadorNodeManager = {
 		return new Promise(function(resolve, reject) {
 			
 			//Buscar si clave ya existe
-			let next = OrquestadorNodeManager.findKey(key);
+			let node = OrquestadorNodeManager.findKey(key);
 
-			if(next === false) {
+			if(node === false) {
 				reject('Clave inexistente.');
 			} else {
+				
+				debug('Obteniendo clave %s del nodo %s', key, node);
 			
-				KVHTTP.get(next, '/'+key).then(function(data) {
+				KVHTTP.get(node, '/'+key).then(function(data) {
+					debug('Clave %s obtenida de %s', key, node);
 					resolve(data);
 				}, function(err) {
+					debug('Error al obtener clave %s de %s: %o', key, node, err);
 					reject(err);
-				})			
+				});
 				
 			}
 

@@ -1,3 +1,5 @@
+let debug = require('debug')('KVStore:NodoWorker');
+
 let NodoWorker = {
 	
 	data: {},
@@ -36,7 +38,7 @@ let NodoWorker = {
 	
 	save: function(response, key, value) {
 		
-		console.log('save: '+key+': '+value);
+		debug('Almacenando clave %s', key);
 		
 		NodoWorker.data[key] = value;
 		response.send({ success: true, key: key, value: value });
@@ -48,9 +50,10 @@ let NodoWorker = {
 		if(typeof NodoWorker.data[key] !== 'undefined') {
 			let value = NodoWorker.data[key];
 			
-			console.log('get: '+key+': '+value);			
+			debug('Leyendo clave %s', key);
 			response.send({ success: true, key: key, value: value });
 		} else {
+			debug('Clave %s inexistente', key);
 			NodoWorker.error(response, 'Clave inexistente');
 		}
 		

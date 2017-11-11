@@ -1,4 +1,5 @@
 const cluster = require('cluster');
+let debug = require('debug')('KVStore:OrquestadorProcess');
 let InterprocessMessage = require('./InterprocessMessage');
 
 let OrquestadorProcess = {
@@ -11,6 +12,8 @@ let OrquestadorProcess = {
 	
 	broadcast: function(key, node) {
 		//Enviar nueva clave a workers
+		debug('Enviando clave %s a todos los workers', key);
+		
 		for (const id in cluster.workers) {
 			cluster.workers[id].send({ cmd: InterprocessMessage.NEW_KEY, key: key, node: node });
 		}

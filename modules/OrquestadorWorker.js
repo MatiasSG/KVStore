@@ -1,4 +1,5 @@
 const cluster = require('cluster');
+let debug = require('debug')('KVStore:OrquestadorWorker');
 
 let InterprocessMessage = require('./InterprocessMessage');
 let OrquestadorNodeManager = require('./OrquestadorNodeManager');
@@ -34,7 +35,7 @@ let OrquestadorWorker = {
 
 		nodes.forEach(function(url) {
 			OrquestadorNodeManager.attachNode(url).then(function(url) {
-				console.log('Nodo '+url+' agregado a worker '+cluster.worker.id+'.');
+				debug('Nodo %s agregado a worker %s', url, cluster.worker.id);
 			}, function(error) {
 				console.error(error);
 				process.exit();
