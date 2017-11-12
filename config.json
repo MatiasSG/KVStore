@@ -1,0 +1,5 @@
+{
+  "maxKeySize": 512,
+  "maxValSize": 512,
+  "maxPairNum": 1024
+}
