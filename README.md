@@ -16,6 +16,19 @@ Levantar un orquestador, indicando el puerto en el que va a escuchar y la lista 
 ```
 node Orquestador.js 3000 localhost:3100 localhost:3200 localhost:3300
 ```
+## Configuración
+Los nodos de datos pueden recibir un archivo de configuración como tercer parametro
+```
+node Nodo.js 3100 unaconf.json
+```
+Debe tener el formato siguiente
+```
+{
+  "maxKeySize": 512, // maximo tamaño de clave en megabytes
+  "maxValSize": 512, // maximo tamaño de valor en megabytes
+  "maxPairNum": 1024 // maxima cantidad de pares clave-valor por nodo
+}
+```
 ## Uso
 Enviar un JSON por POST al orquestador para almacenar claves:
 ```
