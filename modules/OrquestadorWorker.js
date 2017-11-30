@@ -19,6 +19,18 @@ let OrquestadorWorker = {
 			OrquestadorWorker.get(response, request.params.key);
 		});
 	
+		app.get('/min/:value', function(request, response) {
+			OrquestadorWorker.collect(response, '/min/'+request.params.value);
+		});
+	
+		app.get('/max/:value', function(request, response) {
+			OrquestadorWorker.collect(response, '/max/'+request.params.value);
+		});
+	
+		app.get('/:key', function(request, response) {
+			OrquestadorWorker.get(response, request.params.key);
+		});
+	
 		app.post('/', function(request, response) {
 			if(!request.body.key || !request.body.value) {
 				OrquestadorWorker.error(response, 'JSON inválido');
@@ -66,6 +78,14 @@ let OrquestadorWorker = {
 			response.send(data);
 		}, function(err) {
 			OrquestadorWorker.error(response, err);			
+		});
+		
+	},
+	
+	collect: function(response, path) {
+		
+		OrquestadorNodeManager.collect(path).then(function(data) {
+			response.send(data);
 		});
 		
 	},

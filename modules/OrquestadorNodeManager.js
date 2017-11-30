@@ -112,6 +112,47 @@ let OrquestadorNodeManager = {
 
 		});
 		
+	},
+	
+	collect: function(path) {
+		
+		return new Promise(function(resolve) {
+			
+			//Recolectar resultados de todos los nodos
+			var answered = 0;
+			var total = OrquestadorNodeManager.nodes.length;
+			var output = { keys: {}, ok: [], failed: [] };
+			
+			OrquestadorNodeManager.nodes.forEach(function(node) {
+				
+				debug('Obteniendo %s del nodo %s', path, node);
+			
+				KVHTTP.get(node, path).then(function(data) {
+					debug('%s obtenido de %s', path, node);
+					
+					for(var key in data.keys) {
+						output.keys[key] = data.keys[key];
+					}
+					
+					output.ok.push(node);
+					answered++;
+					
+					if(answered == total) {
+						resolve(output)
+					}
+				}, function(err) {
+					output.failed.push(node);
+					answered++;
+					
+					if(answered == total) {
+						resolve(output);
+					}
+				});
+
+			});
+			
+		});
+		
 	}
 	
 }

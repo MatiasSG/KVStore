@@ -15,6 +15,14 @@ let NodoWorker = {
 			response.send({ success: true });
 		});
 
+		app.get('/min/:value', function(request, response) {
+			NodoWorker.min(response, request.params.value);
+		});
+
+		app.get('/max/:value', function(request, response) {
+			NodoWorker.max(response, request.params.value);
+		});
+
 		app.get('/:key', function(request, response) {
 			NodoWorker.get(response, request.params.key);
 		});
@@ -76,6 +84,35 @@ let NodoWorker = {
 			debug('Clave %s inexistente', key);
 			NodoWorker.error(response, 404, 'Clave inexistente');
 		}
+
+	},
+	
+	min: function(response, min) {
+		
+		NodoWorker.getFiltered(response, function(v) {
+			return (v >= min);
+		})
+		
+	},
+
+	max: function(response, min) {
+		
+		NodoWorker.getFiltered(response, function(v) {
+			return (v <= min);
+		})
+		
+	},
+
+	getFiltered: function(response, filter) {
+	
+		debug('Filtrando claves');
+		
+		var output = {};
+		for(var i in NodoWorker.data)
+			if(filter(NodoWorker.data[i]))
+				output[i] = NodoWorker.data[i];
+
+		response.send({ success: true, keys: output });
 
 	}
 
