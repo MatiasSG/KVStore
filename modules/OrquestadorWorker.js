@@ -6,23 +6,39 @@ let OrquestadorNodeManager = require('./OrquestadorNodeManager');
 
 let OrquestadorWorker = {
 	
-	init: function(app, port, nodes) {
-		
-		OrquestadorWorker.initServer(app, port);
+	init: function(app, config, port, nodes) {
+
+		OrquestadorWorker.initServer(app, config, port);
 		OrquestadorWorker.initNodes(nodes);
-		
+
 	},
-	
-	initServer: function(app, port) {
+
+	initServer: function(app, config, port) {
 		
+		app.get('/id', function (request, response) {
+			response.send({id: OrquestadorNodeManager.id});
+		});
+		
+		app.get('/is-master', function (request, response) {
+			//se remueve a si mismo de la lista de nodos es una restriccion para que funcione
+			//nadie va querer pegarle al nodo de una misma computadora a travez de internet
+			//por lo tanto es sano asumir que en mi archivo de configuracion...
+			//...o bien no esta este nodo o bien esta como localhost:<puerto>
+			var orquestadoresWithoutSelf = config.orquestadores.filter(function (node) {
+				return !(node.includes("localhost") && node.includes(port));
+			});
+
+			OrquestadorWorker.isItMaster(response, orquestadoresWithoutSelf);
+		});
+
 		app.get('/:key', function(request, response) {
 			OrquestadorWorker.get(response, request.params.key);
 		});
-	
+
 		app.get('/min/:value', function(request, response) {
 			OrquestadorWorker.collect(response, '/min/'+request.params.value);
 		});
-	
+
 		app.get('/max/:value', function(request, response) {
 			OrquestadorWorker.collect(response, '/max/'+request.params.value);
 		});
@@ -34,9 +50,9 @@ let OrquestadorWorker = {
 				OrquestadorWorker.save(response, request.body.key, request.body.value);
 			}
 		});
-		
+
 		app.listen(port);
-		
+
 	},
 	
 	initNodes: function(nodes) {
@@ -87,6 +103,9 @@ let OrquestadorWorker = {
 	},
 	
 	handleProcessMessage: function(obj) {
+		if(obj.cmd == InterprocessMessage.SET_ID) {
+			OrquestadorNodeManager.id = obj.thisNodeId;
+		}
 		
 		//Recibir ubicación de nuevas claves del processo maestro
 		if(obj.cmd === InterprocessMessage.NEW_KEY) {
@@ -95,7 +114,11 @@ let OrquestadorWorker = {
 		
 	},
 	
-	
+	isItMaster: function (response, orquestadores) {
+		OrquestadorNodeManager.isItMaster(orquestadores).then(function (isMaster) {
+			response.send({ isMaster });
+		})
+	}
 };
 
 module.exports = OrquestadorWorker;

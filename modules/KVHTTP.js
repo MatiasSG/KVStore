@@ -1,12 +1,13 @@
 var Promise = require('promise');
 let http = require('http');
 
+const errors =  {
+	CONNECTION_ERROR: "CONNECTION_ERROR: ",
+	PARSING_ERROR: "PARSING_ERROR: "
+};
+
 var KVHTTP = {
-	errors: {
-		CONNECTION_ERROR: "CONNECTION_ERROR: ",
-		PARSING_ERROR: "PARSING_ERROR: "
-	},
-	
+
 	get: function(url, path) {
 
 		return new Promise(function(resolve, reject) {
@@ -15,7 +16,7 @@ var KVHTTP = {
 			if(host.length !== 2) {
 				reject(url+' no es un servidor válido.');
 			}
-				
+			
 			http.get({
 				hostname: host[0],
 				port: host[1],
@@ -30,12 +31,12 @@ var KVHTTP = {
 						let parsedData = JSON.parse(rawData);
 						resolve(parsedData);
 					} catch(e) {
-						reject(this.errors.PARSING_ERROR + e.message);
+						reject(errors.PARSING_ERROR + e.message);
 					}
 				});
 
 			}).on('error', function(e) {
-				reject(this.errors.CONNECTION_ERROR + e.message);
+				reject(errors.CONNECTION_ERROR + e.message);
 			});
 
 		});
@@ -74,12 +75,12 @@ var KVHTTP = {
 						let parsedData = JSON.parse(rawData);
 						resolve(parsedData);
 					} catch(e) {
-						reject(this.errors.PARSING_ERROR + e.message);
+						reject(errors.PARSING_ERROR + e.message);
 					}
 				});
 
 			}).on('error', function(e) {
-				reject(this.errors.CONNECTION_ERROR + e.message);
+				reject(errors.CONNECTION_ERROR + e.message);
 			});
 			
 			request.end(body);
