@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 //Nodo
 let NodoWorker = require('./modules/NodoWorker');
-let config = require('./config'); //default
+let config = require('./config/nodo'); //default
 
 if(process.argv.length < 3) {
 	console.error('Faltan parámetros: node Nodo.js <puerto> [config]');
@@ -35,4 +35,4 @@ if(!config.maxKeySize || !config.maxPairNum || !config.maxValSize) {
 
 let port = process.argv[2];
 NodoWorker.init(app, port, config);
-console.log('Nodo iniciado en puerto ' + port + ' usando la configuracion de ' + (userConfig || 'config.json'));
+console.log('Nodo iniciado en puerto ' + port + ' usando la configuracion de ' + (userConfig || 'config/nodo.json'));
