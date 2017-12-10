@@ -2,9 +2,13 @@ var Promise = require('promise');
 let http = require('http');
 
 var KVHTTP = {
+	errors: {
+		CONNECTION_ERROR: "CONNECTION_ERROR: ",
+		PARSING_ERROR: "PARSING_ERROR: "
+	},
 	
 	get: function(url, path) {
-		
+
 		return new Promise(function(resolve, reject) {
 
 			host = url.split(':');
@@ -26,18 +30,18 @@ var KVHTTP = {
 						let parsedData = JSON.parse(rawData);
 						resolve(parsedData);
 					} catch(e) {
-						reject(e.message);
+						reject(this.errors.PARSING_ERROR + e.message);
 					}
 				});
-	
+
 			}).on('error', function(e) {
-				reject(e.message);
+				reject(this.errors.CONNECTION_ERROR + e.message);
 			});
-			
+
 		});
 			
 	},
-	
+
 	post: function(url, path, body) {
 
 		return new Promise(function(resolve, reject) {
@@ -70,12 +74,12 @@ var KVHTTP = {
 						let parsedData = JSON.parse(rawData);
 						resolve(parsedData);
 					} catch(e) {
-						reject(e.message);
+						reject(this.errors.PARSING_ERROR + e.message);
 					}
 				});
 
 			}).on('error', function(e) {
-				reject(e.message);
+				reject(this.errors.CONNECTION_ERROR + e.message);
 			});
 			
 			request.end(body);
