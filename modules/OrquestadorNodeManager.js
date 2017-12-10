@@ -51,27 +51,20 @@ let OrquestadorNodeManager = {
 		return new Promise(function(resolve, reject) {
 
 			//Buscar si clave ya existe
-			let next = OrquestadorNodeManager.findKey(key);
+			let dataNodeToSave = OrquestadorNodeManager.findKey(key) || OrquestadorNodeManager.nextNode();
 
-			if(next === false) {
-
-				//Buscar próximo nodo
-				next = OrquestadorNodeManager.nextNode();
-
-			}
+			debug('Enviando clave %s al nodo %s', key, dataNodeToSave);
 			
-			debug('Enviando clave %s al nodo %s', key, next);
-			
-			KVHTTP.post(next, '/', { key: key, value: value }).then(function(data) {
+			KVHTTP.post(dataNodeToSave, '/', { key: key, value: value }).then(function(data) {
 				
-				debug('Clave %s almacenada en %s', key, next);
+				debug('Clave %s almacenada en %s', key, dataNodeToSave);
 				
 				//Notificar proceso maestro
-				process.send({ cmd: InterprocessMessage.BROADCAST, key: key, node: next });
+				process.send({ cmd: InterprocessMessage.BROADCAST, key: key, node: dataNodeToSave });
 				
 				resolve(data);
 			}, function(err) {
-				debug('Error al almacenar clave %s en %s', key, next);
+				debug('Error al almacenar clave %s en %s', key, dataNodeToSave);
 				reject(err);
 			})			
 			

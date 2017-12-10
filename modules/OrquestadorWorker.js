@@ -26,11 +26,7 @@ let OrquestadorWorker = {
 		app.get('/max/:value', function(request, response) {
 			OrquestadorWorker.collect(response, '/max/'+request.params.value);
 		});
-	
-		app.get('/:key', function(request, response) {
-			OrquestadorWorker.get(response, request.params.key);
-		});
-	
+
 		app.post('/', function(request, response) {
 			if(!request.body.key || !request.body.value) {
 				OrquestadorWorker.error(response, 'JSON inválido');

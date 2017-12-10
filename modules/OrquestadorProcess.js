@@ -11,7 +11,6 @@ let OrquestadorProcess = {
 	},
 	
 	broadcast: function(key, node) {
-		//Enviar nueva clave a workers
 		debug('Enviando clave %s a todos los workers', key);
 		
 		for (const id in cluster.workers) {
