@@ -3,8 +3,8 @@ let http = require('http');
 let request = require('request-promise-native');
 
 const errors =  {
-	CONNECTION_ERROR: "CONNECTION_ERROR: ",
-	PARSING_ERROR: "PARSING_ERROR: "
+	CONNECTION_ERROR: 'CONNECTION_ERROR: ',
+	PARSING_ERROR: 'PARSING_ERROR: '
 };
 
 var KVHTTP = {
@@ -45,7 +45,7 @@ var KVHTTP = {
 
 	},
 
-	post: function(url, path, body) {
+	post: function(url, path, body, thisNodeId) {
 
 		return new Promise(function(resolve, reject) {
 
@@ -56,25 +56,20 @@ var KVHTTP = {
 
 			body = JSON.stringify(body);
 
-          console.log({
-            hostname: host[0],
-            port: host[1],
-            path: path,
-            method: 'POST',
-            headers: {
-              "Content-Type": "application/json",
-              "Content-Length": Buffer.byteLength(body)
-            }
-          })
+			var headers = {
+				'Content-Type': 'application/json',
+				'Content-Length': Buffer.byteLength(body)
+			};
+
+			if(thisNodeId)
+				headers['x-sent-by-id'] = thisNodeId.toString();
+
 			let request = new http.ClientRequest({
+				headers,
 				hostname: host[0],
 				port: host[1],
 				path: path,
-				method: 'POST',
-				headers: {
-			        "Content-Type": "application/json",
-			        "Content-Length": Buffer.byteLength(body)
-				}
+				method: 'POST'
 			});
 
 			request.on('response', function(res) {
@@ -101,11 +96,19 @@ var KVHTTP = {
 
 	},
 
-	delete: function(url, path) {
-		var urlWithProtocol = url.includes("http")? url : "http://" + url
+	delete: function(url, path, thisNodeId) {
+		var urlWithProtocol = url.includes('http')? url : 'http://' + url;
+		var options = {
+			url: urlWithProtocol + path,
+			method: 'DELETE'
+		};
 
-		return request.delete(urlWithProtocol + path).on('error', function (e) {
-			reject(errors.CONNECTION_ERROR + e.message);
+		if(thisNodeId){
+			options.headers = {'x-sent-by-id': thisNodeId.toString()}
+		}
+
+		return request(options).on('error', function (e) {
+			return Promise.reject(errors.CONNECTION_ERROR + e.message);
 		});
 	}
 

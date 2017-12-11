@@ -18,9 +18,8 @@ let OrquestadorWorker = require('./modules/OrquestadorWorker');
 var orquestadorInputs = getAndValidateInput();
 
 if (cluster.isMaster) {
-	var thisOrquestadorId = parseInt(Math.random() * 10000000);
+	var thisOrquestadorId = process.argv.indexOf('-beMaster') > -1 ? 10000000 : parseInt(Math.random() * 10000000);
 
-	// Fork workers.
 	for (let i = 0; i < cpus; i++) {
 		let worker = cluster.fork();
 		worker.on('message', OrquestadorProcess.handleWorkerMessage);
@@ -40,37 +39,40 @@ function getAndValidateInput() {
 	var args = process.argv.map(id => id);
 
 	var config = require('./config/orquestador.json');
-
-	var confOptIdx = args.indexOf("-c");
-	var userConfig = args[confOptIdx + 1];
+	var confOptIdx = args.indexOf('-c');
 
 	//solo queremos logear desde el master, sino vemos repetido el mensaje por worker
 	var logOnlyToMaster = ((message, logType) => { if(cluster.isMaster) console[logType || 'log'](message) });
 
+	if(args.indexOf('-beMaster') > -1) {
+		args = args.filter(el => el != '-beMaster');
+	}
+	
 	//se paso -c y existe el siguiente argumento
-	if(confOptIdx >= 0 && userConfig) {
+	if(confOptIdx > -1) {
+		var userConfig = args[confOptIdx + 1];
+		
 		try {
-			logOnlyToMaster("Leyendo " + userConfig);
+			logOnlyToMaster('Leyendo ' + userConfig);
 
 			config = require(resolve(userConfig));
 
 			//la configuracion debe tener
 			//el atributo orquestadores
 			if(!config.orquestadores) {
-				logOnlyToMaster("El archivo de configuracion no tiene un listado de orquestadores", 'error');
+				logOnlyToMaster('El archivo de configuracion no tiene un listado de orquestadores', 'error');
 				process.exit();
 			}
 
-			logOnlyToMaster("Orquestadores en configuracion: " + config.orquestadores);
+			logOnlyToMaster('Orquestadores en configuracion: ' + config.orquestadores);
 
-			args.pop(confOptIdx);
-			args.pop(confOptIdx + 1);
+			args = args.filter(function(el, idx) { return !(idx == confOptIdx || idx == confOptIdx + 1) });
 		} catch (e) {
-			logOnlyToMaster("no se pudo leer la configuración " + userConfig, 'error');
+			logOnlyToMaster('no se pudo leer la configuración ' + userConfig, 'error');
 			process.exit()
 		}
 	} else {
-		logOnlyToMaster("Usando configuracion por defecto en config/orquestador.json")
+		logOnlyToMaster('Usando configuracion por defecto en config/orquestador.json')
 	}
 
 	if(args.length < 4) {
