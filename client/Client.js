@@ -1,35 +1,24 @@
-var resolve = require("path").resolve
-var config = require(resolve("../config/orquestador"));
-var driver = require("./Driver")(config);
-var fs = require( "fs" );
-var fd = fs.openSync( "/dev/stdin", "rs" );
+var masterFinderWith = require('./MasterFinder');
 
-console.log("Usando los siguientes nodos orquestadores", orquestadores);
+module.exports = function driverWith(config) {
+  
+  var masterFinder = masterFinderWith(config)
 
-var fixtureInsertions = [
-  driver.insert("someKey", "someValue")
-].concat(
-  [
-    {key: "A", value: "primero"},
-    {key: "B", value: "segundo"},
-    {key: "C", value: "medio"},
-    {key: "D", value: "anteultimo"},
-    {key: "E", value: "ultimo"}
-  ].map(function (pair) {
-    driver.insert(pair.key, pair.value);
-  })
-)
+  return {
+    get: function (key) {
+      return masterFinder.getFromMaster(key);
+    },
 
-driver.get("someKey")
-driver.rangeAbove("C");
-driver.rangeBelow("C");
+    insert: function (key, value) {
+      return masterFinder.postToMaster(key, value);
+    },
 
-console.log("Frenado! ahora se puede matar al master y ver el failover");
-console.log("Apretar enter cuando se haya matado el master");
-fs.readSync( fd, new Buffer( 1 ), 0, 1 );
-fs.closeSync( fd );
+    allBelow: function (key) {
+      return masterFinder.getFromMaster('max/' + key);
+    },
 
-//kill some master and try again
-driver.get("someKey")
-driver.rangeAbove("C");
-driver.rangeBelow("C");
+    allAbove: function (key) {
+      return masterFinder.getFromMaster('min/' + key);
+    }
+  }
+}
