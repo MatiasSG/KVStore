@@ -16,7 +16,7 @@ var KVHTTP = {
 			if(host.length !== 2) {
 				reject(url+' no es un servidor válido.');
 			}
-			
+
 			http.get({
 				hostname: host[0],
 				port: host[1],
@@ -90,5 +90,7 @@ var KVHTTP = {
 	}
 	
 }
+
+KVHTTP.errors = errors;
 
 module.exports = KVHTTP;
