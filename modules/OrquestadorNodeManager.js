@@ -109,6 +109,32 @@ let OrquestadorNodeManager = {
 
 	},
 
+	delete: function (key) {
+
+		return new Promise(function(resolve, reject) {
+
+			//Buscar si clave ya existe
+			let node = OrquestadorNodeManager.findKey(key);
+
+			if(node === false) {
+				reject('Clave inexistente.');
+			} else {
+
+				debug('Borrando clave %s del nodo %s', key, node);
+
+				KVHTTP.delete(node, '/'+key).then(function(data) {
+					debug('Clave %s borrada de %s', key, node);
+					resolve(data);
+				}, function(err) {
+					debug('Error al borrar clave %s de %s: %o', key, node, err);
+					reject(err);
+				});
+
+			}
+
+		});
+	},
+
 	collect: function(path) {
 
 		return new Promise(function(resolve) {

@@ -27,6 +27,10 @@ let NodoWorker = {
 			NodoWorker.get(response, request.params.key);
 		});
 
+		app.delete('/:key', function(request, response) {
+			NodoWorker.delete(response, request.params.key);
+		});
+
 		app.post('/', function(request, response) {
 			const error = NodoWorker.checkErrors(request);
 
@@ -85,6 +89,18 @@ let NodoWorker = {
 			NodoWorker.error(response, 404, 'Clave inexistente');
 		}
 
+	},
+
+	delete: function (response, key) {
+		if(typeof NodoWorker.data[key] !== 'undefined') {
+			let value = delete NodoWorker.data[key];
+
+			debug('Borrando clave %s', key);
+			response.send({ success: true, key: key, value: value });
+		} else {
+			debug('Clave %s inexistente', key);
+			NodoWorker.error(response, 404, 'Clave inexistente');
+		}
 	},
 	
 	min: function(response, min) {

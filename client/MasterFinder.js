@@ -21,6 +21,12 @@ module.exports = function masterFinderWith(config) {
       });
     },
 
+    deleteFromMaster: function (key) {
+      return masterFinder.requestToMaster(function (master) {
+        return KVHTTP.delete(master.url, '/' + key);
+      });
+    },
+
     /////////////////////////////////////////////////////////////////////
     //// LOS METODOS QUE SIGUEN SON MAS BIEN UTILITARIOS             ////
     //// SOLO DEBERIAN INTERESARLES AL CLIENTE LOS METODOS DE ARRIBA ////

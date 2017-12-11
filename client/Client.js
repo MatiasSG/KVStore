@@ -13,6 +13,10 @@ module.exports = function driverWith(config) {
       return masterFinder.postToMaster(key, value);
     },
 
+    delete: function (key) {
+      return masterFinder.deleteFromMaster(key);
+    },
+
     allBelow: function (key) {
       return masterFinder.getFromMaster('max/' + key);
     },

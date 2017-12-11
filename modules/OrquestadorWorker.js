@@ -35,6 +35,10 @@ let OrquestadorWorker = {
 			OrquestadorWorker.get(response, request.params.key);
 		});
 
+		app.delete('/:key', function (request, response) {
+			OrquestadorWorker.delete(response, request.params.key);
+		})
+
 		app.get('/min/:value', function(request, response) {
 			OrquestadorWorker.collect(response, '/min/'+request.params.value);
 		});
@@ -92,6 +96,17 @@ let OrquestadorWorker = {
 			OrquestadorWorker.error(response, err);			
 		});
 		
+	},
+
+	delete: function (response, key) {
+
+		OrquestadorNodeManager.delete(key).then(function(data) {
+			data.worker = cluster.worker.id;
+			response.send(data);
+		}, function(err) {
+			OrquestadorWorker.error(response, err);
+		});
+
 	},
 	
 	collect: function(response, path) {
