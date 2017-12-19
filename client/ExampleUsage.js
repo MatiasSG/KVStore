@@ -12,29 +12,36 @@ Promise.all([
   client.insert('someKey', 'someValue')
 ].concat(
   [
-    {key: 'A', value: 'primero'},
-    {key: 'B', value: 'segundo'},
-    {key: 'C', value: 'medio'},
-    {key: 'D', value: 'anteultimo'},
-    {key: 'E', value: 'ultimo'}
+    {key: 'A', value: '1'},
+    {key: 'B', value: '2'},
+    {key: 'C', value: '3'},
+    {key: 'D', value: '4'},
+    {key: 'E', value: '5'}
   ].map(function (pair) {
     client.insert(pair.key, pair.value).then(console.log);
   })
-).concat([
-  client.get('someKey').then(console.log),
-  client.allAbove('C').then(console.log),
-  client.allBelow('C').then(console.log)
-])).then(function () {
-  console.log();
-  console.log('Frenando!!! Ahora se puede matar un master!');
-  console.log('Cuando se haya matado al master actual, presionar enter para seguir!');
+)).then(function() {
 
-  fs.readSync(fd, new Buffer(1), 0, 1);
-  fs.closeSync(fd);
+  Promise.all([
 
-  client.get('someKey').then(console.log)
-  client.allAbove('C').then(console.log);
-  client.allBelow('C').then(console.log);
+	  client.get('someKey').then(console.log),
+	  client.allAbove(3).then(console.log),
+	  client.allBelow(3).then(console.log)
+
+  ]).then(function() {
+	
+	  console.log();
+	  console.log('Frenando!!! Ahora se puede matar un master!');
+	  console.log('Cuando se haya matado al master actual, presionar enter para seguir!');
+	
+	  fs.readSync(fd, new Buffer(1), 0, 1);
+	  fs.closeSync(fd);
+	
+	  client.get('someKey').then(console.log)
+	  client.allAbove(3).then(console.log);
+	  client.allBelow(3).then(console.log);
+	  
+  });
 });
 
 

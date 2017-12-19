@@ -71,7 +71,7 @@ module.exports = function masterFinderWith(config) {
               //reintenta 3 veces, esperando un total de 1 segundo
               return Promise
                 .delay(attempts * 200)
-                .then(masterFinder.requestToMaster(realRequestTo, attempts - 1));
+                .then(function() { return masterFinder.requestToMaster(realRequestTo, attempts - 1) });
             });
           }
         });
